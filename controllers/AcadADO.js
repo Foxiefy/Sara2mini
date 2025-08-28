@@ -1,216 +1,75 @@
 const ConexaoBD = require('../models/ConexaoBD');
 const { QueryTypes } = require('sequelize');
 
-//cursos, matrizes, disciplinas, discentes, turmas, matriculas,
-
 class AcadADO {
-    constructor() {
-        this.con = ConexaoBD.connect(); // Usa a conexão do ConexaoBD
+ constructor() {
+        this.con = ConexaoBD.acadMini; // conecta ao banco acadMini
     }
 
-    // CURSOS
-    async listarCursos() {
-        const [rows] = await this.con.query("SELECT * FROM cursos", { type: QueryTypes.SELECT });
-        return rows;
-    }
-    async buscarCursosPorId(id) {
-        const [row] = await this.con.query("SELECT * FROM cursos WHERE id = ?", {
-            replacements: [id],
-            type: QueryTypes.SELECT
-        });
-        return row;
-    }
-    async criarCurso(curso) {
-        const [result] = await this.con.query("INSERT INTO cursos (nome, carga_horaria) VALUES (?, ?)", {
-            replacements: [curso.nome, curso.carga_horaria],
-            type: QueryTypes.INSERT
-        });
-        return result;
-    }
-    async atualizarCurso(id, curso) {
-        const [result] = await this.con.query("UPDATE cursos SET nome = ?, carga_horaria = ? WHERE id = ?", {
-            replacements: [curso.nome, curso.carga_horaria, id],
-            type: QueryTypes.UPDATE
-        });
-        return result;
-    }
-    async deletarCurso(id) {
-        const [result] = await this.con.query("DELETE FROM cursos WHERE id = ?", {
-            replacements: [id],
-            type: QueryTypes.DELETE
-        });
+    async query(sql, replacements = {}, type = QueryTypes.SELECT) {
+        const [result] = await this.con.query(sql, { replacements, type });
         return result;
     }
 
-    // MATRIZES
-    async listarMatrizes() {
-        const [rows] = await this.con.query("SELECT * FROM matrizes", { type: QueryTypes.SELECT });
-        return rows;
-    }
-    async buscarMatrizPorId(id) {
-        const [row] = await this.con.query("SELECT * FROM matrizes WHERE id = ?", {
-            replacements: [id],
-            type: QueryTypes.SELECT
-        });
-        return row;
-    }
-    async criarMatriz(matriz) {
-        const [result] = await this.con.query("INSERT INTO matrizes (nome) VALUES (?)", {
-            replacements: [matriz.nome],
-            type: QueryTypes.INSERT
-        });
-        return result;
-    }
-    async atualizarMatriz(id, matriz) {
-        const [result] = await this.con.query("UPDATE matrizes SET nome = ? WHERE id = ?", {
-            replacements: [matriz.nome, id],
-            type: QueryTypes.UPDATE
-        });
-        return result;
-    }
-    async deletarMatriz(id) {
-        const [result] = await this.con.query("DELETE FROM matrizes WHERE id = ?", {
-            replacements: [id],
-            type: QueryTypes.DELETE
-        });
-        return result;
+    async listar(tabela) {
+        return this.query(`SELECT * FROM ${tabela}`);
     }
 
-    // DISCIPLINAS
-    async listarDisciplinas() {
-        const [rows] = await this.con.query("SELECT * FROM disciplinas", { type: QueryTypes.SELECT });
-        return rows;
-    }
-    async buscarDisciplinaPorId(id) {
-        const [row] = await this.con.query("SELECT * FROM disciplinas WHERE id = ?", {
-            replacements: [id],
-            type: QueryTypes.SELECT
-        });
-        return row;
-    }
-    async criarDisciplina(disciplina) {
-        const [result] = await this.con.query("INSERT INTO disciplinas (nome, carga_horaria) VALUES (?, ?)", {
-            replacements: [disciplina.nome, disciplina.carga_horaria],
-            type: QueryTypes.INSERT
-        });
-        return result;
-    }
-    async atualizarDisciplina(id, disciplina) {
-        const [result] = await this.con.query("UPDATE disciplinas SET nome = ?, carga_horaria = ? WHERE id = ?", {
-            replacements: [disciplina.nome, disciplina.carga_horaria, id],
-            type: QueryTypes.UPDATE
-        });
-        return result;
-    }
-    async deletarDisciplina(id) {
-        const [result] = await this.con.query("DELETE FROM disciplinas WHERE id = ?", {
-            replacements: [id],
-            type: QueryTypes.DELETE
-        });
-        return result;
+    async buscarPorId(tabela, id) {
+        return this.query(`SELECT * FROM ${tabela} WHERE id = :id`, { id });
     }
 
-    // DISCENTES
-    async listarDiscentes() {
-        const [rows] = await this.con.query("SELECT * FROM discentes", { type: QueryTypes.SELECT });
-        return rows;
-    }
-    async buscarDiscentePorId(id) {
-        const [row] = await this.con.query("SELECT * FROM discentes WHERE id = ?", {
-            replacements: [id],
-            type: QueryTypes.SELECT
-        });
-        return row;
-    }
-    async criarDiscente(discente) {
-        const [result] = await this.con.query("INSERT INTO discentes (nome, matricula) VALUES (?, ?)", {
-            replacements: [discente.nome, discente.matricula],
-            type: QueryTypes.INSERT
-        });
-        return result;
-    }
-    async atualizarDiscente(id, discente) {
-        const [result] = await this.con.query("UPDATE discentes SET nome = ?, matricula = ? WHERE id = ?", {
-            replacements: [discente.nome, discente.matricula, id],
-            type: QueryTypes.UPDATE
-        });
-        return result;
-    }
-    async deletarDiscente(id) {
-        const [result] = await this.con.query("DELETE FROM discentes WHERE id = ?", {
-            replacements: [id],
-            type: QueryTypes.DELETE
-        });
-        return result;
+    async criar(tabela, dados) {
+        const cols = Object.keys(dados).join(', ');
+        const vals = Object.keys(dados).map(k => `:${k}`).join(', ');
+        return this.query(`INSERT INTO ${tabela} (${cols}) VALUES (${vals})`, dados, QueryTypes.INSERT);
     }
 
-    // TURMAS
-    async listarTurmas() {
-        const [rows] = await this.con.query("SELECT * FROM turmas", { type: QueryTypes.SELECT });
-        return rows;
-    }
-    async buscarTurmaPorId(id) {
-        const [row] = await this.con.query("SELECT * FROM turmas WHERE id = ?", {
-            replacements: [id],
-            type: QueryTypes.SELECT
-        });
-        return row;
-    }
-    async criarTurma(turma) {
-        const [result] = await this.con.query("INSERT INTO turmas (nome, ano) VALUES (?, ?)", {
-            replacements: [turma.nome, turma.ano],
-            type: QueryTypes.INSERT
-        });
-        return result;
-    }
-    async atualizarTurma(id, turma) {
-        const [result] = await this.con.query("UPDATE turmas SET nome = ?, ano = ? WHERE id = ?", {
-            replacements: [turma.nome, turma.ano, id],
-            type: QueryTypes.UPDATE
-        });
-        return result;
-    }
-    async deletarTurma(id) {
-        const [result] = await this.con.query("DELETE FROM turmas WHERE id = ?", {
-            replacements: [id],
-            type: QueryTypes.DELETE
-        });
-        return result;
+    async atualizar(tabela, id, dados) {
+        const set = Object.keys(dados).map(k => `${k} = :${k}`).join(', ');
+        return this.query(`UPDATE ${tabela} SET ${set} WHERE id = :id`, { ...dados, id }, QueryTypes.UPDATE);
     }
 
-    // MATRICULAS
-    async listarMatriculas() {
-        const [rows] = await this.con.query("SELECT * FROM matriculas", { type: QueryTypes.SELECT });
-        return rows;
+    async deletar(tabela, id) {
+        return this.query(`DELETE FROM ${tabela} WHERE id = :id`, { id }, QueryTypes.DELETE);
     }
-    async buscarMatriculaPorId(id) {
-        const [row] = await this.con.query("SELECT * FROM matriculas WHERE id = ?", {
-            replacements: [id],
-            type: QueryTypes.SELECT
-        });
-        return row;
-    }
-    async criarMatricula(matricula) {
-        const [result] = await this.con.query("INSERT INTO matriculas (id_discente, id_turma) VALUES (?, ?)", {
-            replacements: [matricula.id_discente, matricula.id_turma],
-            type: QueryTypes.INSERT
-        });
-        return result;
-    }
-    async atualizarMatricula(id, matricula) {
-        const [result] = await this.con.query("UPDATE matriculas SET id_discente = ?, id_turma = ? WHERE id = ?", {
-            replacements: [matricula.id_discente, matricula.id_turma, id],
-            type: QueryTypes.UPDATE
-        });
-        return result;
-    }
-    async deletarMatricula(id) {
-        const [result] = await this.con.query("DELETE FROM matriculas WHERE id = ?", {
-            replacements: [id],
-            type: QueryTypes.DELETE
-        });
-        return result;
-    }
+
+    // Métodos específicos para facilitar uso
+    listarCursos() { return this.listar('cursos'); }
+    buscarCursoPorId(id) { return this.buscarPorId('cursos', id); }
+    criarCurso(dados) { return this.criar('cursos', dados); }
+    atualizarCurso(id, dados) { return this.atualizar('cursos', id, dados); }
+    deletarCurso(id) { return this.deletar('cursos', id); }
+
+    listarMatrizes() { return this.listar('matrizes'); }
+    buscarMatrizPorId(id) { return this.buscarPorId('matrizes', id); }
+    criarMatriz(dados) { return this.criar('matrizes', dados); }
+    atualizarMatriz(id, dados) { return this.atualizar('matrizes', id, dados); }
+    deletarMatriz(id) { return this.deletar('matrizes', id); }
+
+    listarDisciplinas() { return this.listar('disciplinas'); }
+    buscarDisciplinaPorId(id) { return this.buscarPorId('disciplinas', id); }
+    criarDisciplina(dados) { return this.criar('disciplinas', dados); }
+    atualizarDisciplina(id, dados) { return this.atualizar('disciplinas', id, dados); }
+    deletarDisciplina(id) { return this.deletar('disciplinas', id); }
+
+    listarDiscentes() { return this.listar('discentes'); }
+    buscarDiscentePorId(id) { return this.buscarPorId('discentes', id); }
+    criarDiscente(dados) { return this.criar('discentes', dados); }
+    atualizarDiscente(id, dados) { return this.atualizar('discentes', id, dados); }
+    deletarDiscente(id) { return this.deletar('discentes', id); }
+
+    listarTurmas() { return this.listar('turmas'); }
+    buscarTurmaPorId(id) { return this.buscarPorId('turmas', id); }
+    criarTurma(dados) { return this.criar('turmas', dados); }
+    atualizarTurma(id, dados) { return this.atualizar('turmas', id, dados); }
+    deletarTurma(id) { return this.deletar('turmas', id); }
+
+    listarMatriculas() { return this.listar('matriculas'); }
+    buscarMatriculaPorId(id) { return this.buscarPorId('matriculas', id); }
+    criarMatricula(dados) { return this.criar('matriculas', dados); }
+    atualizarMatricula(id, dados) { return this.atualizar('matriculas', id, dados); }
+    deletarMatricula(id) { return this.deletar('matriculas', id); }
 }
 
 module.exports = AcadADO;
