@@ -1,0 +1,27 @@
+{
+  "name": "sara2mini",
+  "version": "1.0.0",
+  "description": "Versao mini tentativa 1",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Foxiefy/Sara2mini.git"
+  },
+  "author": "Lis E Ernandes",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Foxiefy/Sara2mini/issues"
+  },
+  "homepage": "https://github.com/Foxiefy/Sara2mini#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "mysql2": "^3.14.3",
+    "sequelize": "^6.37.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
